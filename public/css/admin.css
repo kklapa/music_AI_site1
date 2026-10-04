@@ -1,0 +1,51 @@
+/* Адмін-панель: доповнення до style.css */
+
+.admin-body { padding-bottom: 60px; }
+.adm { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+.adm-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: calc(16px + var(--safe-t)) 0 8px; }
+.adm-top h1 { font-size: clamp(24px, 4vw, 34px); display: flex; align-items: center; gap: 12px; }
+.adm-tabs { position: sticky; top: 0; z-index: 20; background: rgba(7, 7, 12, 0.85); backdrop-filter: blur(16px); margin: 0 -16px 18px; padding: 0 16px; }
+.adm-login { max-width: 400px; margin: 14vh auto 0; }
+.adm-login .panel { display: grid; gap: 16px; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 8px; }
+.stat-card { padding: 18px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 4px; }
+.stat-card b { font-size: 30px; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.stat-card span { color: var(--muted); font-size: 13px; }
+.top-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: top; }
+.top-list li { display: flex; align-items: center; gap: 12px; counter-increment: top; }
+.top-list li::before { content: counter(top); width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; background: var(--surface-2); font-size: 12px; font-weight: 700; }
+.top-list span { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.form-grid { display: grid; gap: 14px; }
+@media (min-width: 760px) { .form-grid.cols-2 { grid-template-columns: 1fr 1fr; } .form-grid .span-2 { grid-column: 1 / -1; } }
+.dropzone { display: grid; gap: 6px; padding: 18px; border: 1.5px dashed var(--line); border-radius: 18px; background: rgba(255, 255, 255, 0.03); transition: border-color 0.2s, background 0.2s; }
+.dropzone.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.file-name { font-size: 13px; color: var(--muted); word-break: break-all; }
+.progress { height: 8px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--c1), var(--c2)); transition: width 0.2s; }
+.cover-preview { width: 96px; border-radius: 14px; }
+
+.table-wrap { overflow-x: auto; border-radius: 20px; border: 1px solid var(--line); background: var(--surface); }
+table.tbl { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 14px; }
+.tbl th { text-align: left; padding: 12px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tbl td { padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+.tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tbl .actions { display: flex; gap: 4px; justify-content: flex-end; }
+.cell-track { display: flex; align-items: center; gap: 12px; min-width: 220px; }
+.cell-track b { display: block; max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-track small { color: var(--muted); }
+.cell-text { max-width: 420px; word-break: break-word; }
+.adm-note { padding: 12px 16px; border-radius: 14px; background: rgba(255, 255, 255, 0.05); color: #cfcfe2; font-size: 14px; }
+.adm-note code, .code-block { font-family: var(--mono); font-size: 12.5px; }
+.code-block { margin: 0; padding: 14px; border-radius: 14px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--line); overflow: auto; white-space: pre; color: #dedeef; }
+.check-row { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.check-row label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.check-row input { accent-color: var(--accent); width: 18px; height: 18px; }
+.result-ok { color: var(--ok); }
+.result-bad { color: var(--danger); }
+
+.adm-panel form > .btn-row, .adm-panel form > .progress { margin-top: 18px; }
+.adm-panel .switch.span-2 { margin-top: 4px; }

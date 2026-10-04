@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    container_name: ai-waves
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: 3000
+      DATA_DIR: /app/data
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - aiwaves-data:/app/data
+      - aiwaves-uploads:/app/uploads
+    # Локальний доступ без тунелю: http://localhost:3000 (приберіть, якщо потрібен лише тунель)
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # Cloudflare Tunnel: публікує app:3000 на ваш домен без відкритих портів.
+  # Запуск разом із тунелем:  docker compose --profile tunnel up -d
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: ai-waves-tunnel
+    restart: unless-stopped
+    profiles: ["tunnel"]
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    depends_on:
+      - app
+
+volumes:
+  aiwaves-data:
+  aiwaves-uploads:

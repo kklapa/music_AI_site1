@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AI Waves — стрімінг ШІ-музики</title>
+  <meta name="description" content="Слухайте музику, створену штучним інтелектом: коментарі на таймлайні, спільне прослуховування в реальному часі, ШІ-промпти.">
+  <meta name="theme-color" content="#07070c">
+  <meta name="color-scheme" content="dark">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AI Waves">
+  <!--OG-->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+
+  <header class="topbar" id="topbar">
+    <a href="/" class="logo" data-link aria-label="AI Waves — головна">
+      <span class="logo-mark" data-icon="logo"></span>
+      <span class="logo-text">AI&nbsp;Waves</span>
+    </a>
+    <nav class="nav" aria-label="Основна навігація">
+      <a href="/" data-link data-nav="home"><span data-icon="home"></span><span class="nav-label">Головна</span></a>
+      <a href="/rooms" data-link data-nav="rooms"><span data-icon="radio"></span><span class="nav-label">Кімнати</span></a>
+      <a href="/me" data-link data-nav="me"><span data-icon="user"></span><span class="nav-label">Кабінет</span></a>
+    </nav>
+    <div class="topbar-actions">
+      <a href="#" class="room-pill" id="roomPill" hidden data-link><span data-icon="radio"></span><span id="roomPillText"></span></a>
+      <button class="btn-icon" id="installBtn" hidden title="Встановити застосунок" aria-label="Встановити застосунок"><span data-icon="download"></span></button>
+      <button class="btn-icon" id="settingsBtn" title="Налаштування" aria-label="Налаштування"><span data-icon="settings"></span></button>
+      <div class="user-slot" id="userSlot"></div>
+    </div>
+  </header>
+
+  <main id="view" tabindex="-1" aria-live="polite"></main>
+
+  <!-- Глобальний sticky-плеєр -->
+  <div class="player" id="player" hidden>
+    <div class="mini-progress" id="miniProgress"><i></i></div>
+    <div class="mini-main">
+      <button class="mini-info" id="miniInfo" aria-label="Відкрити великий плеєр">
+        <span class="mini-cover" id="miniCover"></span>
+        <span class="mini-text"><b id="miniTitle">—</b><small id="miniArtist"></small></span>
+      </button>
+
+      <div class="mini-center">
+        <div class="ctrls">
+          <button class="btn-icon sm hide-sm" id="miniShuffle" aria-label="Перемішати" title="Перемішати"><span data-icon="shuffle"></span></button>
+          <button class="btn-icon hide-sm" id="miniPrev" aria-label="Попередній" title="Попередній (P)"><span data-icon="prev"></span></button>
+          <button class="btn-play" id="miniPlay" aria-label="Грати / пауза" title="Грати / пауза (Пробіл)"><span data-icon="play"></span></button>
+          <button class="btn-icon" id="miniNext" aria-label="Наступний" title="Наступний (N)"><span data-icon="next"></span></button>
+          <button class="btn-icon sm hide-sm" id="miniRepeat" aria-label="Повтор" title="Повтор"><span data-icon="repeat"></span></button>
+        </div>
+        <div class="seek-row hide-sm">
+          <span class="time" id="miniCur">0:00</span>
+          <div class="seek" id="miniSeek" role="slider" tabindex="0" aria-label="Перемотка" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="seek-track"><div class="seek-buffer"></div><div class="seek-fill"></div></div>
+            <div class="seek-thumb"></div>
+            <div class="markers"></div>
+          </div>
+          <span class="time" id="miniDur">0:00</span>
+        </div>
+      </div>
+
+      <div class="mini-right">
+        <button class="btn-chip hide-sm" id="miniPrompt" title="ШІ-промпт цього треку"><span data-icon="sparkles"></span><span>ШІ Промпт</span></button>
+        <span id="miniLikeSlot"></span>
+        <div class="volume hide-sm" id="miniVolumeWrap">
+          <button class="btn-icon sm" id="miniMute" aria-label="Вимкнути звук" title="Звук (M)"><span data-icon="volume"></span></button>
+          <input type="range" id="miniVolume" min="0" max="1" step="0.01" value="0.9" aria-label="Гучність">
+        </div>
+        <button class="btn-icon hide-sm" id="miniExpand" aria-label="Розгорнути плеєр" title="Розгорнути"><span data-icon="chevron-up"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Повноекранний плеєр (Now Playing) -->
+  <section class="np" id="np" aria-hidden="true" role="dialog" aria-label="Зараз грає">
+    <div class="np-top" id="npTop">
+      <button class="btn-icon" id="npClose" aria-label="Згорнути"><span data-icon="chevron-down"></span></button>
+      <span class="np-handle" aria-hidden="true"></span>
+      <button class="btn-chip" id="npRoomBadge" hidden><span data-icon="radio"></span><span id="npRoomBadgeText"></span></button>
+      <button class="btn-icon" id="npSettings" aria-label="Налаштування"><span data-icon="settings"></span></button>
+    </div>
+
+    <div class="np-body">
+      <div class="np-stage">
+        <div class="np-cover-wrap" id="npCoverWrap">
+          <div class="np-cover" id="npCover"></div>
+          <div class="react-layer" aria-hidden="true"></div>
+          <div class="comment-bubble" id="npBubble" hidden></div>
+        </div>
+        <canvas class="viz" id="viz" aria-hidden="true"></canvas>
+      </div>
+
+      <div class="np-panel">
+        <div class="np-meta">
+          <div class="np-titles">
+            <h2 id="npTitle">—</h2>
+            <a id="npArtist" class="np-artist" href="#" data-link></a>
+          </div>
+          <div class="np-actions">
+            <span id="npLikeSlot"></span>
+            <button class="btn-chip" id="npPrompt"><span data-icon="sparkles"></span><span>ШІ Промпт</span></button>
+          </div>
+        </div>
+
+        <div class="np-seek">
+          <div class="seek" id="npSeek" role="slider" tabindex="0" aria-label="Перемотка" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="seek-track"><div class="seek-buffer"></div><div class="seek-fill"></div></div>
+            <div class="seek-thumb"></div>
+            <div class="markers"></div>
+          </div>
+          <div class="np-times"><span class="time" id="npCur">0:00</span><span class="time" id="npDur">0:00</span></div>
+        </div>
+
+        <div class="np-controls">
+          <button class="btn-icon" id="npShuffle" aria-label="Перемішати"><span data-icon="shuffle"></span></button>
+          <button class="btn-icon lg" id="npPrev" aria-label="Попередній"><span data-icon="prev"></span></button>
+          <button class="btn-play lg" id="npPlay" aria-label="Грати / пауза"><span data-icon="play"></span></button>
+          <button class="btn-icon lg" id="npNext" aria-label="Наступний"><span data-icon="next"></span></button>
+          <button class="btn-icon" id="npRepeat" aria-label="Повтор"><span data-icon="repeat"></span></button>
+        </div>
+
+        <div class="np-compose" id="npCompose"></div>
+
+        <div class="np-react" id="npReact" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="modal-root"></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
